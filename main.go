@@ -43,214 +43,214 @@ import (
 )
 
 var (
-	cli = kingpin.New("TruffleHog", "TruffleHog is a tool for finding credentials.")
+	cli = kingpin.New("TruffleHog", "TruffleHog 是一个用于寻找凭证的工具。")
 	cmd string
 	// https://github.com/trufflesecurity/trufflehog/blob/main/CONTRIBUTING.md#logging-in-trufflehog
-	logLevel            = cli.Flag("log-level", `Logging verbosity on a scale of 0 (info) to 5 (trace). Can be disabled with "-1".`).Default("0").Int()
-	debug               = cli.Flag("debug", "Run in debug mode.").Hidden().Bool()
-	trace               = cli.Flag("trace", "Run in trace mode.").Hidden().Bool()
-	profile             = cli.Flag("profile", "Enables profiling and sets a pprof and fgprof server on :18066.").Bool()
-	localDev            = cli.Flag("local-dev", "Hidden feature to disable overseer for local dev.").Hidden().Bool()
-	jsonOut             = cli.Flag("json", "Output in JSON format.").Short('j').Bool()
-	jsonLegacy          = cli.Flag("json-legacy", "Use the pre-v3.0 JSON format. Only works with git, gitlab, and github sources.").Bool()
-	gitHubActionsFormat = cli.Flag("github-actions", "Output in GitHub Actions format.").Bool()
-	concurrency         = cli.Flag("concurrency", "Number of concurrent workers.").Default(strconv.Itoa(runtime.NumCPU())).Int()
-	noVerification      = cli.Flag("no-verification", "Don't verify the results.").Bool()
-	onlyVerified        = cli.Flag("only-verified", "Only output verified results.").Hidden().Bool()
-	results             = cli.Flag("results", "Specifies which type(s) of results to output: verified, unknown, unverified, filtered_unverified. Defaults to all types.").String()
+	logLevel            = cli.Flag("log-level", `日志级别，范围从 0（信息）到 5（追踪）。可以通过“-1”禁用日志。`).Default("0").Int()
+	debug               = cli.Flag("debug", "以调试模式运行。").Hidden().Bool()
+	trace               = cli.Flag("trace", "以追踪模式运行。").Hidden().Bool()
+	profile             = cli.Flag("profile", "启用性能分析并在 :18066 启动 pprof 和 fgprof 服务器。").Bool()
+	localDev            = cli.Flag("local-dev", "隐藏功能，禁用本地开发时的 overseer。").Hidden().Bool()
+	jsonOut             = cli.Flag("json", "以 JSON 格式输出。").Short('j').Bool()
+	jsonLegacy          = cli.Flag("json-legacy", "使用预 v3.0 的 JSON 格式。仅适用于 git、gitlab 和 github 来源。").Bool()
+	gitHubActionsFormat = cli.Flag("github-actions", "以 GitHub Actions 格式输出。").Bool()
+	concurrency         = cli.Flag("concurrency", "并发工作线程数。").Default(strconv.Itoa(runtime.NumCPU())).Int()
+	noVerification      = cli.Flag("no-verification", "不验证结果。").Bool()
+	onlyVerified        = cli.Flag("only-verified", "仅输出已验证的结果。").Hidden().Bool()
+	results             = cli.Flag("results", "指定输出的结果类型：已验证、未知、未验证、过滤未验证。默认输出所有类型。").String()
 
-	allowVerificationOverlap   = cli.Flag("allow-verification-overlap", "Allow verification of similar credentials across detectors").Bool()
-	filterUnverified           = cli.Flag("filter-unverified", "Only output first unverified result per chunk per detector if there are more than one results.").Bool()
-	filterEntropy              = cli.Flag("filter-entropy", "Filter unverified results with Shannon entropy. Start with 3.0.").Float64()
-	scanEntireChunk            = cli.Flag("scan-entire-chunk", "Scan the entire chunk for secrets.").Hidden().Default("false").Bool()
-	compareDetectionStrategies = cli.Flag("compare-detection-strategies", "Compare different detection strategies for matching spans").Hidden().Default("false").Bool()
-	configFilename             = cli.Flag("config", "Path to configuration file.").ExistingFile()
-	// rules = cli.Flag("rules", "Path to file with custom rules.").String()
-	printAvgDetectorTime = cli.Flag("print-avg-detector-time", "Print the average time spent on each detector.").Bool()
-	noUpdate             = cli.Flag("no-update", "Don't check for updates.").Bool()
-	fail                 = cli.Flag("fail", "Exit with code 183 if results are found.").Bool()
-	verifiers            = cli.Flag("verifier", "Set custom verification endpoints.").StringMap()
-	customVerifiersOnly  = cli.Flag("custom-verifiers-only", "Only use custom verification endpoints.").Bool()
-	detectorTimeout      = cli.Flag("detector-timeout", "Maximum time to spend scanning chunks per detector (e.g., 30s).").Duration()
-	archiveMaxSize       = cli.Flag("archive-max-size", "Maximum size of archive to scan. (Byte units eg. 512B, 2KB, 4MB)").Bytes()
-	archiveMaxDepth      = cli.Flag("archive-max-depth", "Maximum depth of archive to scan.").Int()
-	archiveTimeout       = cli.Flag("archive-timeout", "Maximum time to spend extracting an archive.").Duration()
-	includeDetectors     = cli.Flag("include-detectors", "Comma separated list of detector types to include. Protobuf name or IDs may be used, as well as ranges.").Default("all").String()
-	excludeDetectors     = cli.Flag("exclude-detectors", "Comma separated list of detector types to exclude. Protobuf name or IDs may be used, as well as ranges. IDs defined here take precedence over the include list.").String()
-	jobReportFile        = cli.Flag("output-report", "Write a scan report to the provided path.").Hidden().OpenFile(os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	allowVerificationOverlap   = cli.Flag("allow-verification-overlap", "允许不同检测器检测到相似凭证时进行验证").Bool()
+	filterUnverified           = cli.Flag("filter-unverified", "仅输出每个块每个检测器的第一个未验证结果，如果有多个结果。").Bool()
+	filterEntropy              = cli.Flag("filter-entropy", "使用香农熵过滤未验证结果。建议从 3.0 开始。").Float64()
+	scanEntireChunk            = cli.Flag("scan-entire-chunk", "扫描整个块以查找秘密。").Hidden().Default("false").Bool()
+	compareDetectionStrategies = cli.Flag("compare-detection-strategies", "比较不同的检测策略以匹配跨度").Hidden().Default("false").Bool()
+	configFilename             = cli.Flag("config", "配置文件路径。").ExistingFile()
+	// rules = cli.Flag("rules", "包含自定义规则的文件路径。").String()
+	printAvgDetectorTime = cli.Flag("print-avg-detector-time", "打印每个检测器的平均处理时间。").Bool()
+	noUpdate             = cli.Flag("no-update", "不检查更新。").Bool()
+	fail                 = cli.Flag("fail", "如果找到结果，则退出码为 183。").Bool()
+	verifiers            = cli.Flag("verifier", "设置自定义验证端点。").StringMap()
+	customVerifiersOnly  = cli.Flag("custom-verifiers-only", "仅使用自定义验证端点。").Bool()
+	detectorTimeout      = cli.Flag("detector-timeout", "每个检测器扫描块的最大时间（例如：30s）。").Duration()
+	archiveMaxSize       = cli.Flag("archive-max-size", "扫描的最大归档文件大小。（字节单位，如 512B、2KB、4MB）").Bytes()
+	archiveMaxDepth      = cli.Flag("archive-max-depth", "扫描归档文件的最大深度。").Int()
+	archiveTimeout       = cli.Flag("archive-timeout", "提取归档文件的最大时间。").Duration()
+	includeDetectors     = cli.Flag("include-detectors", "包含的检测器类型列表，逗号分隔。可以使用 protobuf 名称或 ID，也可以使用范围。").Default("all").String()
+	excludeDetectors     = cli.Flag("exclude-detectors", "排除的检测器类型列表，逗号分隔。可以使用 protobuf 名称或 ID，也可以使用范围。ID 在此处定义时优先于包含列表。").String()
+	jobReportFile        = cli.Flag("output-report", "将扫描报告写入提供的路径。").Hidden().OpenFile(os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 
-	noVerificationCache = cli.Flag("no-verification-cache", "Disable verification caching").Bool()
+	noVerificationCache = cli.Flag("no-verification-cache", "禁用验证缓存").Bool()
 
-	// Add feature flags
-	forceSkipBinaries  = cli.Flag("force-skip-binaries", "Force skipping binaries.").Bool()
-	forceSkipArchives  = cli.Flag("force-skip-archives", "Force skipping archives.").Bool()
-	skipAdditionalRefs = cli.Flag("skip-additional-refs", "Skip additional references.").Bool()
-	userAgentSuffix    = cli.Flag("user-agent-suffix", "Suffix to add to User-Agent.").String()
+	// 添加功能标志
+	forceSkipBinaries  = cli.Flag("force-skip-binaries", "强制跳过二进制文件。").Bool()
+	forceSkipArchives  = cli.Flag("force-skip-archives", "强制跳过归档文件。").Bool()
+	skipAdditionalRefs = cli.Flag("skip-additional-refs", "跳过额外的引用。").Bool()
+	userAgentSuffix    = cli.Flag("user-agent-suffix", "添加到 User-Agent 的后缀。").String()
 
-	gitScan             = cli.Command("git", "Find credentials in git repositories.")
-	gitScanURI          = gitScan.Arg("uri", "Git repository URL. https://, file://, or ssh:// schema expected.").Required().String()
-	gitScanIncludePaths = gitScan.Flag("include-paths", "Path to file with newline separated regexes for files to include in scan.").Short('i').String()
-	gitScanExcludePaths = gitScan.Flag("exclude-paths", "Path to file with newline separated regexes for files to exclude in scan.").Short('x').String()
-	gitScanExcludeGlobs = gitScan.Flag("exclude-globs", "Comma separated list of globs to exclude in scan. This option filters at the `git log` level, resulting in faster scans.").String()
-	gitScanSinceCommit  = gitScan.Flag("since-commit", "Commit to start scan from.").String()
-	gitScanBranch       = gitScan.Flag("branch", "Branch to scan.").String()
-	gitScanMaxDepth     = gitScan.Flag("max-depth", "Maximum depth of commits to scan.").Int()
-	gitScanBare         = gitScan.Flag("bare", "Scan bare repository (e.g. useful while using in pre-receive hooks)").Bool()
-	_                   = gitScan.Flag("allow", "No-op flag for backwards compat.").Bool()
-	_                   = gitScan.Flag("entropy", "No-op flag for backwards compat.").Bool()
-	_                   = gitScan.Flag("regex", "No-op flag for backwards compat.").Bool()
-
-	githubScan                  = cli.Command("github", "Find credentials in GitHub repositories.")
-	githubScanEndpoint          = githubScan.Flag("endpoint", "GitHub endpoint.").Default("https://api.github.com").String()
-	githubScanRepos             = githubScan.Flag("repo", `GitHub repository to scan. You can repeat this flag. Example: "https://github.com/dustin-decker/secretsandstuff"`).Strings()
-	githubScanOrgs              = githubScan.Flag("org", `GitHub organization to scan. You can repeat this flag. Example: "trufflesecurity"`).Strings()
-	githubScanToken             = githubScan.Flag("token", "GitHub token. Can be provided with environment variable GITHUB_TOKEN.").Envar("GITHUB_TOKEN").String()
-	githubIncludeForks          = githubScan.Flag("include-forks", "Include forks in scan.").Bool()
-	githubIncludeMembers        = githubScan.Flag("include-members", "Include organization member repositories in scan.").Bool()
-	githubIncludeRepos          = githubScan.Flag("include-repos", `Repositories to include in an org scan. This can also be a glob pattern. You can repeat this flag. Must use Github repo full name. Example: "trufflesecurity/trufflehog", "trufflesecurity/t*"`).Strings()
-	githubIncludeWikis          = githubScan.Flag("include-wikis", "Include repository wikisin scan.").Bool()
-	githubExcludeRepos          = githubScan.Flag("exclude-repos", `Repositories to exclude in an org scan. This can also be a glob pattern. You can repeat this flag. Must use Github repo full name. Example: "trufflesecurity/driftwood", "trufflesecurity/d*"`).Strings()
-	githubScanIncludePaths      = githubScan.Flag("include-paths", "Path to file with newline separated regexes for files to include in scan.").Short('i').String()
-	githubScanExcludePaths      = githubScan.Flag("exclude-paths", "Path to file with newline separated regexes for files to exclude in scan.").Short('x').String()
-	githubScanIssueComments     = githubScan.Flag("issue-comments", "Include issue descriptions and comments in scan.").Bool()
-	githubScanPRComments        = githubScan.Flag("pr-comments", "Include pull request descriptions and comments in scan.").Bool()
-	githubScanGistComments      = githubScan.Flag("gist-comments", "Include gist comments in scan.").Bool()
-	githubCommentsTimeframeDays = githubScan.Flag("comments-timeframe", "Number of days in the past to review when scanning issue, PR, and gist comments.").Uint32()
-
-	// GitHub Cross Fork Object Reference Experimental Feature
-	githubExperimentalScan = cli.Command("github-experimental", "Run an experimental GitHub scan. Must specify at least one experimental sub-module to run: object-discovery.")
-	// GitHub Experimental SubModules
-	githubExperimentalObjectDiscovery = githubExperimentalScan.Flag("object-discovery", "Discover hidden data objects in GitHub repositories.").Bool()
-	// GitHub Experimental Options
-	githubExperimentalToken              = githubExperimentalScan.Flag("token", "GitHub token. Can be provided with environment variable GITHUB_TOKEN.").Envar("GITHUB_TOKEN").String()
-	githubExperimentalRepo               = githubExperimentalScan.Flag("repo", "GitHub repository to scan. Example: https://github.com/<user>/<repo>.git").Required().String()
-	githubExperimentalCollisionThreshold = githubExperimentalScan.Flag("collision-threshold", "Threshold for short-sha collisions in object-discovery submodule. Default is 1.").Default("1").Int()
-	githubExperimentalDeleteCache        = githubExperimentalScan.Flag("delete-cached-data", "Delete cached data after object-discovery secret scanning.").Bool()
-
-	gitlabScan = cli.Command("gitlab", "Find credentials in GitLab repositories.")
-	// TODO: Add more GitLab options
-	gitlabScanEndpoint     = gitlabScan.Flag("endpoint", "GitLab endpoint.").Default("https://gitlab.com").String()
-	gitlabScanRepos        = gitlabScan.Flag("repo", "GitLab repo url. You can repeat this flag. Leave empty to scan all repos accessible with provided credential. Example: https://gitlab.com/org/repo.git").Strings()
-	gitlabScanToken        = gitlabScan.Flag("token", "GitLab token. Can be provided with environment variable GITLAB_TOKEN.").Envar("GITLAB_TOKEN").Required().String()
-	gitlabScanIncludePaths = gitlabScan.Flag("include-paths", "Path to file with newline separated regexes for files to include in scan.").Short('i').String()
-	gitlabScanExcludePaths = gitlabScan.Flag("exclude-paths", "Path to file with newline separated regexes for files to exclude in scan.").Short('x').String()
-	gitlabScanIncludeRepos = gitlabScan.Flag("include-repos", `Repositories to include in an org scan. This can also be a glob pattern. You can repeat this flag. Must use Gitlab repo full name. Example: "trufflesecurity/trufflehog", "trufflesecurity/t*"`).Strings()
-	gitlabScanExcludeRepos = gitlabScan.Flag("exclude-repos", `Repositories to exclude in an org scan. This can also be a glob pattern. You can repeat this flag. Must use Gitlab repo full name. Example: "trufflesecurity/driftwood", "trufflesecurity/d*"`).Strings()
-
-	filesystemScan  = cli.Command("filesystem", "Find credentials in a filesystem.")
-	filesystemPaths = filesystemScan.Arg("path", "Path to file or directory to scan.").Strings()
-	// DEPRECATED: --directory is deprecated in favor of arguments.
-	filesystemDirectories = filesystemScan.Flag("directory", "Path to directory to scan. You can repeat this flag.").Strings()
-	// TODO: Add more filesystem scan options. Currently only supports scanning a list of directories.
-	// filesystemScanRecursive = filesystemScan.Flag("recursive", "Scan recursively.").Short('r').Bool()
-	filesystemScanIncludePaths = filesystemScan.Flag("include-paths", "Path to file with newline separated regexes for files to include in scan.").Short('i').String()
-	filesystemScanExcludePaths = filesystemScan.Flag("exclude-paths", "Path to file with newline separated regexes for files to exclude in scan.").Short('x').String()
-
-	s3Scan              = cli.Command("s3", "Find credentials in S3 buckets.")
-	s3ScanKey           = s3Scan.Flag("key", "S3 key used to authenticate. Can be provided with environment variable AWS_ACCESS_KEY_ID.").Envar("AWS_ACCESS_KEY_ID").String()
-	s3ScanRoleArns      = s3Scan.Flag("role-arn", "Specify the ARN of an IAM role to assume for scanning. You can repeat this flag.").Strings()
-	s3ScanSecret        = s3Scan.Flag("secret", "S3 secret used to authenticate. Can be provided with environment variable AWS_SECRET_ACCESS_KEY.").Envar("AWS_SECRET_ACCESS_KEY").String()
-	s3ScanSessionToken  = s3Scan.Flag("session-token", "S3 session token used to authenticate temporary credentials. Can be provided with environment variable AWS_SESSION_TOKEN.").Envar("AWS_SESSION_TOKEN").String()
-	s3ScanCloudEnv      = s3Scan.Flag("cloud-environment", "Use IAM credentials in cloud environment.").Bool()
-	s3ScanBuckets       = s3Scan.Flag("bucket", "Name of S3 bucket to scan. You can repeat this flag. Incompatible with --ignore-bucket.").Strings()
-	s3ScanIgnoreBuckets = s3Scan.Flag("ignore-bucket", "Name of S3 bucket to ignore. You can repeat this flag. Incompatible with --bucket.").Strings()
-	s3ScanMaxObjectSize = s3Scan.Flag("max-object-size", "Maximum size of objects to scan. Objects larger than this will be skipped. (Byte units eg. 512B, 2KB, 4MB)").Default("250MB").Bytes()
-
-	gcsScan           = cli.Command("gcs", "Find credentials in GCS buckets.")
-	gcsProjectID      = gcsScan.Flag("project-id", "GCS project ID used to authenticate. Can NOT be used with unauth scan. Can be provided with environment variable GOOGLE_CLOUD_PROJECT.").Envar("GOOGLE_CLOUD_PROJECT").String()
-	gcsCloudEnv       = gcsScan.Flag("cloud-environment", "Use Application Default Credentials, IAM credentials to authenticate.").Bool()
-	gcsServiceAccount = gcsScan.Flag("service-account", "Path to GCS service account JSON file.").ExistingFile()
-	gcsWithoutAuth    = gcsScan.Flag("without-auth", "Scan GCS buckets without authentication. This will only work for public buckets").Bool()
-	gcsAPIKey         = gcsScan.Flag("api-key", "GCS API key used to authenticate. Can be provided with environment variable GOOGLE_API_KEY.").Envar("GOOGLE_API_KEY").String()
-	gcsIncludeBuckets = gcsScan.Flag("include-buckets", "Buckets to scan. Comma separated list of buckets. You can repeat this flag. Globs are supported").Short('I').Strings()
-	gcsExcludeBuckets = gcsScan.Flag("exclude-buckets", "Buckets to exclude from scan. Comma separated list of buckets. Globs are supported").Short('X').Strings()
-	gcsIncludeObjects = gcsScan.Flag("include-objects", "Objects to scan. Comma separated list of objects. you can repeat this flag. Globs are supported").Short('i').Strings()
-	gcsExcludeObjects = gcsScan.Flag("exclude-objects", "Objects to exclude from scan. Comma separated list of objects. You can repeat this flag. Globs are supported").Short('x').Strings()
-	gcsMaxObjectSize  = gcsScan.Flag("max-object-size", "Maximum size of objects to scan. Objects larger than this will be skipped. (Byte units eg. 512B, 2KB, 4MB)").Default("10MB").Bytes()
-
-	syslogScan     = cli.Command("syslog", "Scan syslog")
-	syslogAddress  = syslogScan.Flag("address", "Address and port to listen on for syslog. Example: 127.0.0.1:514").String()
-	syslogProtocol = syslogScan.Flag("protocol", "Protocol to listen on. udp or tcp").String()
-	syslogTLSCert  = syslogScan.Flag("cert", "Path to TLS cert.").String()
-	syslogTLSKey   = syslogScan.Flag("key", "Path to TLS key.").String()
-	syslogFormat   = syslogScan.Flag("format", "Log format. Can be rfc3164 or rfc5424").String()
-
-	circleCiScan      = cli.Command("circleci", "Scan CircleCI")
-	circleCiScanToken = circleCiScan.Flag("token", "CircleCI token. Can also be provided with environment variable").Envar("CIRCLECI_TOKEN").Required().String()
-
-	dockerScan       = cli.Command("docker", "Scan Docker Image")
-	dockerScanImages = dockerScan.Flag("image", "Docker image to scan. Use the file:// prefix to point to a local tarball, otherwise a image registry is assumed.").Required().Strings()
-	dockerScanToken  = dockerScan.Flag("token", "Docker bearer token. Can also be provided with environment variable").Envar("DOCKER_TOKEN").String()
-
-	travisCiScan      = cli.Command("travisci", "Scan TravisCI")
-	travisCiScanToken = travisCiScan.Flag("token", "TravisCI token. Can also be provided with environment variable").Envar("TRAVISCI_TOKEN").Required().String()
-
-	// Postman is hidden for now until we get more feedback from the community.
-	postmanScan  = cli.Command("postman", "Scan Postman")
-	postmanToken = postmanScan.Flag("token", "Postman token. Can also be provided with environment variable").Envar("POSTMAN_TOKEN").String()
-
-	postmanWorkspaces   = postmanScan.Flag("workspace", "Postman workspace to scan. You can repeat this flag. Deprecated flag.").Hidden().Strings()
-	postmanWorkspaceIDs = postmanScan.Flag("workspace-id", "Postman workspace ID to scan. You can repeat this flag.").Strings()
-
-	postmanCollections   = postmanScan.Flag("collection", "Postman collection to scan. You can repeat this flag. Deprecated flag.").Hidden().Strings()
-	postmanCollectionIDs = postmanScan.Flag("collection-id", "Postman collection ID to scan. You can repeat this flag.").Strings()
-
-	postmanEnvironments = postmanScan.Flag("environment", "Postman environment to scan. You can repeat this flag.").Strings()
-
-	postmanIncludeCollections   = postmanScan.Flag("include-collections", "Collections to include in scan. You can repeat this flag. Deprecated flag.").Hidden().Strings()
-	postmanIncludeCollectionIDs = postmanScan.Flag("include-collection-id", "Collection ID to include in scan. You can repeat this flag.").Strings()
-
-	postmanIncludeEnvironments = postmanScan.Flag("include-environments", "Environments to include in scan. You can repeat this flag.").Strings()
-
-	postmanExcludeCollections   = postmanScan.Flag("exclude-collections", "Collections to exclude from scan. You can repeat this flag. Deprecated flag.").Hidden().Strings()
-	postmanExcludeCollectionIDs = postmanScan.Flag("exclude-collection-id", "Collection ID to exclude from scan. You can repeat this flag.").Strings()
-
-	postmanExcludeEnvironments = postmanScan.Flag("exclude-environments", "Environments to exclude from scan. You can repeat this flag.").Strings()
-	postmanWorkspacePaths      = postmanScan.Flag("workspace-paths", "Path to Postman workspaces.").Strings()
-	postmanCollectionPaths     = postmanScan.Flag("collection-paths", "Path to Postman collections.").Strings()
-	postmanEnvironmentPaths    = postmanScan.Flag("environment-paths", "Path to Postman environments.").Strings()
-
-	elasticsearchScan           = cli.Command("elasticsearch", "Scan Elasticsearch")
-	elasticsearchNodes          = elasticsearchScan.Flag("nodes", "Elasticsearch nodes").Envar("ELASTICSEARCH_NODES").Strings()
-	elasticsearchUsername       = elasticsearchScan.Flag("username", "Elasticsearch username").Envar("ELASTICSEARCH_USERNAME").String()
-	elasticsearchPassword       = elasticsearchScan.Flag("password", "Elasticsearch password").Envar("ELASTICSEARCH_PASSWORD").String()
-	elasticsearchServiceToken   = elasticsearchScan.Flag("service-token", "Elasticsearch service token").Envar("ELASTICSEARCH_SERVICE_TOKEN").String()
-	elasticsearchCloudId        = elasticsearchScan.Flag("cloud-id", "Elasticsearch cloud ID. Can also be provided with environment variable").Envar("ELASTICSEARCH_CLOUD_ID").String()
-	elasticsearchAPIKey         = elasticsearchScan.Flag("api-key", "Elasticsearch API key. Can also be provided with environment variable").Envar("ELASTICSEARCH_API_KEY").String()
-	elasticsearchIndexPattern   = elasticsearchScan.Flag("index-pattern", "Filters the indices to search").Default("*").Envar("ELASTICSEARCH_INDEX_PATTERN").String()
-	elasticsearchQueryJSON      = elasticsearchScan.Flag("query-json", "Filters the documents to search").Envar("ELASTICSEARCH_QUERY_JSON").String()
-	elasticsearchSinceTimestamp = elasticsearchScan.Flag("since-timestamp", "Filters the documents to search to those created since this timestamp; overrides any timestamp from --query-json").Envar("ELASTICSEARCH_SINCE_TIMESTAMP").String()
-	elasticsearchBestEffortScan = elasticsearchScan.Flag("best-effort-scan", "Attempts to continuously scan a cluster").Envar("ELASTICSEARCH_BEST_EFFORT_SCAN").Bool()
-
-	jenkinsScan                  = cli.Command("jenkins", "Scan Jenkins")
+	gitScan             = cli.Command("git", "在 Git 仓库中查找凭证。")
+	gitScanURI          = gitScan.Arg("uri", "Git 仓库 URL。预期格式为 https://、file:// 或 ssh://。").Required().String()
+	gitScanIncludePaths = gitScan.Flag("include-paths", "包含在扫描中的文件路径，路径文件内每行一个正则表达式。").Short('i').String()
+	gitScanExcludePaths = gitScan.Flag("exclude-paths", "排除在扫描中的文件路径，路径文件内每行一个正则表达式。").Short('x').String()
+	gitScanExcludeGlobs = gitScan.Flag("exclude-globs", "要排除的逗号分隔的 glob 列表。此选项在 `git log` 层级进行过滤，从而加速扫描。").String()
+	gitScanSinceCommit  = gitScan.Flag("since-commit", "从某个提交开始扫描。").String()
+	gitScanBranch       = gitScan.Flag("branch", "扫描指定分支。").String()
+	gitScanMaxDepth     = gitScan.Flag("max-depth", "扫描的最大提交深度。").Int()
+	gitScanBare         = gitScan.Flag("bare", "扫描裸仓库（例如，适用于 pre-receive 钩子时使用）。").Bool()
+	_                   = gitScan.Flag("allow", "无操作标志，仅为向后兼容。").Bool()
+	_                   = gitScan.Flag("entropy", "无操作标志，仅为向后兼容。").Bool()
+	_                   = gitScan.Flag("regex", "无操作标志，仅为向后兼容。").Bool()
+	githubScan                  = cli.Command("github", "在GitHub仓库中查找凭据。")
+	githubScanEndpoint          = githubScan.Flag("endpoint", "GitHub端点。").Default("https://api.github.com").String()
+	githubScanRepos             = githubScan.Flag("repo", `要扫描的GitHub仓库。你可以多次使用这个标志。示例： "https://github.com/dustin-decker/secretsandstuff"`).Strings()
+	githubScanOrgs              = githubScan.Flag("org", `要扫描的GitHub组织。你可以多次使用这个标志。示例： "trufflesecurity"`).Strings()
+	githubScanToken             = githubScan.Flag("token", "GitHub令牌。可以通过环境变量GITHUB_TOKEN提供。").Envar("GITHUB_TOKEN").String()
+	githubIncludeForks          = githubScan.Flag("include-forks", "在扫描中包含分支。").Bool()
+	githubIncludeMembers        = githubScan.Flag("include-members", "在扫描中包含组织成员的仓库。").Bool()
+	githubIncludeRepos          = githubScan.Flag("include-repos", `在组织扫描中包含的仓库。也可以是一个glob模式。你可以多次使用这个标志。必须使用GitHub仓库的完整名称。示例： "trufflesecurity/trufflehog", "trufflesecurity/t*"`).Strings()
+	githubIncludeWikis          = githubScan.Flag("include-wikis", "在扫描中包含仓库的wiki。").Bool()
+	githubExcludeRepos          = githubScan.Flag("exclude-repos", `在组织扫描中排除的仓库。也可以是一个glob模式。你可以多次使用这个标志。必须使用GitHub仓库的完整名称。示例： "trufflesecurity/driftwood", "trufflesecurity/d*"`).Strings()
+	githubScanIncludePaths      = githubScan.Flag("include-paths", "包含要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('i').String()
+	githubScanExcludePaths      = githubScan.Flag("exclude-paths", "排除要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('x').String()
+	githubScanIssueComments     = githubScan.Flag("issue-comments", "在扫描中包括问题描述和评论。").Bool()
+	githubScanPRComments        = githubScan.Flag("pr-comments", "在扫描中包括拉取请求描述和评论。").Bool()
+	githubScanGistComments      = githubScan.Flag("gist-comments", "在扫描中包括gist评论。").Bool()
+	githubCommentsTimeframeDays = githubScan.Flag("comments-timeframe", "在扫描问题、PR和gist评论时回顾的天数。").Uint32()
+	
+	// GitHub跨分支对象引用实验特性
+	githubExperimentalScan = cli.Command("github-experimental", "运行一个实验性的GitHub扫描。必须至少指定一个实验性子模块进行扫描：object-discovery。")
+	// GitHub实验性子模块
+	githubExperimentalObjectDiscovery = githubExperimentalScan.Flag("object-discovery", "发现GitHub仓库中的隐藏数据对象。").Bool()
+	// GitHub实验性选项
+	githubExperimentalToken              = githubExperimentalScan.Flag("token", "GitHub令牌。可以通过环境变量GITHUB_TOKEN提供。").Envar("GITHUB_TOKEN").String()
+	githubExperimentalRepo               = githubExperimentalScan.Flag("repo", "要扫描的GitHub仓库。示例： https://github.com/<user>/<repo>.git").Required().String()
+	githubExperimentalCollisionThreshold = githubExperimentalScan.Flag("collision-threshold", "在object-discovery子模块中短SHA碰撞的阈值。默认值为1。").Default("1").Int()
+	githubExperimentalDeleteCache        = githubExperimentalScan.Flag("delete-cached-data", "在object-discovery密钥扫描后删除缓存数据。").Bool()
+	
+	gitlabScan = cli.Command("gitlab", "在GitLab仓库中查找凭据。")
+	// TODO: 添加更多GitLab选项
+	gitlabScanEndpoint     = gitlabScan.Flag("endpoint", "GitLab端点。").Default("https://gitlab.com").String()
+	gitlabScanRepos        = gitlabScan.Flag("repo", "GitLab仓库url。你可以多次使用这个标志。留空以扫描提供凭证的所有仓库。示例： https://gitlab.com/org/repo.git").Strings()
+	gitlabScanToken        = gitlabScan.Flag("token", "GitLab令牌。可以通过环境变量GITLAB_TOKEN提供。").Envar("GITLAB_TOKEN").Required().String()
+	gitlabScanIncludePaths = gitlabScan.Flag("include-paths", "包含要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('i').String()
+	gitlabScanExcludePaths = gitlabScan.Flag("exclude-paths", "排除要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('x').String()
+	gitlabScanIncludeRepos = gitlabScan.Flag("include-repos", `在组织扫描中包含的仓库。也可以是一个glob模式。你可以多次使用这个标志。必须使用Gitlab仓库的完整名称。示例： "trufflesecurity/trufflehog", "trufflesecurity/t*"`).Strings()
+	gitlabScanExcludeRepos = gitlabScan.Flag("exclude-repos", `在组织扫描中排除的仓库。也可以是一个glob模式。你可以多次使用这个标志。必须使用Gitlab仓库的完整名称。示例： "trufflesecurity/driftwood", "trufflesecurity/d*"`).Strings()
+	
+	filesystemScan  = cli.Command("filesystem", "在文件系统中查找凭据。")
+	filesystemPaths = filesystemScan.Arg("path", "要扫描的文件或目录的路径。").Strings()
+	// 已废弃：--directory已被参数替代。
+	filesystemDirectories = filesystemScan.Flag("directory", "要扫描的目录路径。你可以多次使用这个标志。").Strings()
+	// TODO: 添加更多文件系统扫描选项。当前仅支持扫描一系列目录。
+	// filesystemScanRecursive = filesystemScan.Flag("recursive", "递归扫描。").Short('r').Bool()
+	filesystemScanIncludePaths = filesystemScan.Flag("include-paths", "包含要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('i').String()
+	filesystemScanExcludePaths = filesystemScan.Flag("exclude-paths", "排除要扫描的文件的正则表达式的路径，每个正则表达式一行。").Short('x').String()
+	
+	s3Scan              = cli.Command("s3", "在S3桶中查找凭据。")
+	s3ScanKey           = s3Scan.Flag("key", "用于认证的S3密钥。可以通过环境变量AWS_ACCESS_KEY_ID提供。").Envar("AWS_ACCESS_KEY_ID").String()
+	s3ScanRoleArns      = s3Scan.Flag("role-arn", "指定用于扫描的IAM角色的ARN。你可以多次使用这个标志。").Strings()
+	s3ScanSecret        = s3Scan.Flag("secret", "用于认证的S3密钥。可以通过环境变量AWS_SECRET_ACCESS_KEY提供。").Envar("AWS_SECRET_ACCESS_KEY").String()
+	s3ScanSessionToken  = s3Scan.Flag("session-token", "用于认证临时凭证的S3会话令牌。可以通过环境变量AWS_SESSION_TOKEN提供。").Envar("AWS_SESSION_TOKEN").String()
+	s3ScanCloudEnv      = s3Scan.Flag("cloud-environment", "使用云环境中的IAM凭证。").Bool()
+	s3ScanBuckets       = s3Scan.Flag("bucket", "要扫描的S3桶的名称。你可以多次使用这个标志。与--ignore-bucket不兼容。").Strings()
+	s3ScanIgnoreBuckets = s3Scan.Flag("ignore-bucket", "要忽略的S3桶的名称。你可以多次使用这个标志。与--bucket不兼容。").Strings()
+	s3ScanMaxObjectSize = s3Scan.Flag("max-object-size", "要扫描的对象的最大大小。大于此大小的对象将被跳过。（字节单位，例如512B，2KB，4MB）").Default("250MB").Bytes()
+	
+	gcsScan           = cli.Command("gcs", "在GCS桶中查找凭据。")
+	gcsProjectID      = gcsScan.Flag("project-id", "用于认证的GCS项目ID。不能与无认证扫描一起使用。可以通过环境变量GOOGLE_CLOUD_PROJECT提供。").Envar("GOOGLE_CLOUD_PROJECT").String()
+	gcsCloudEnv       = gcsScan.Flag("cloud-environment", "使用应用默认凭证、IAM凭证进行认证。").Bool()
+	gcsServiceAccount = gcsScan.Flag("service-account", "GCS服务账户的JSON文件路径。").ExistingFile()
+	gcsWithoutAuth    = gcsScan.Flag("without-auth", "在没有认证的情况下扫描GCS桶。仅适用于公共桶。").Bool()
+	gcsAPIKey         = gcsScan.Flag("api-key", "用于认证的GCS API密钥。可以通过环境变量GOOGLE_API_KEY提供。").Envar("GOOGLE_API_KEY").String()
+	gcsIncludeBuckets = gcsScan.Flag("include-buckets", "要扫描的桶。用逗号分隔的桶列表。你可以多次使用这个标志。支持glob模式").Short('I').Strings()
+	gcsExcludeBuckets = gcsScan.Flag("exclude-buckets", "排除扫描的桶。用逗号分隔的桶列表。支持glob模式").Short('X').Strings()
+	gcsIncludeObjects = gcsScan.Flag("include-objects", "要扫描的对象。用逗号分隔的对象列表。你可以多次使用这个标志。支持glob模式").Short('i').Strings()
+	gcsExcludeObjects = gcsScan.Flag("exclude-objects", "排除扫描的对象。用逗号分隔的对象列表。你可以多次使用这个标志。支持glob模式").Short('x').Strings()
+	gcsMaxObjectSize  = gcsScan.Flag("max-object-size", "要扫描的对象的最大大小。大于此大小的对象将被跳过。（字节单位，例如512B，2KB，4MB）").Default("10MB").Bytes()
+	syslogScan     = cli.Command("syslog", "扫描 syslog")
+	syslogAddress  = syslogScan.Flag("address", "监听 syslog 的地址和端口。例如: 127.0.0.1:514").String()
+	syslogProtocol = syslogScan.Flag("protocol", "监听的协议。udp 或 tcp").String()
+	syslogTLSCert  = syslogScan.Flag("cert", "TLS 证书的路径。").String()
+	syslogTLSKey   = syslogScan.Flag("key", "TLS 密钥的路径。").String()
+	syslogFormat   = syslogScan.Flag("format", "日志格式。可以是 rfc3164 或 rfc5424").String()
+	
+	circleCiScan      = cli.Command("circleci", "扫描 CircleCI")
+	circleCiScanToken = circleCiScan.Flag("token", "CircleCI token。也可以通过环境变量提供").Envar("CIRCLECI_TOKEN").Required().String()
+	
+	dockerScan       = cli.Command("docker", "扫描 Docker 镜像")
+	dockerScanImages = dockerScan.Flag("image", "要扫描的 Docker 镜像。使用 file:// 前缀来指向本地 tarball，否则假定为镜像仓库。").Required().Strings()
+	dockerScanToken  = dockerScan.Flag("token", "Docker bearer token。也可以通过环境变量提供").Envar("DOCKER_TOKEN").String()
+	
+	travisCiScan      = cli.Command("travisci", "扫描 TravisCI")
+	travisCiScanToken = travisCiScan.Flag("token", "TravisCI token。也可以通过环境变量提供").Envar("TRAVISCI_TOKEN").Required().String()
+	
+	// Postman 暂时隐藏，直到我们收到更多社区反馈。
+	postmanScan  = cli.Command("postman", "扫描 Postman")
+	postmanToken = postmanScan.Flag("token", "Postman token。也可以通过环境变量提供").Envar("POSTMAN_TOKEN").String()
+	
+	postmanWorkspaces   = postmanScan.Flag("workspace", "要扫描的 Postman 工作区。此标志可以重复。已弃用的标志。").Hidden().Strings()
+	postmanWorkspaceIDs = postmanScan.Flag("workspace-id", "要扫描的 Postman 工作区 ID。此标志可以重复。").Strings()
+	
+	postmanCollections   = postmanScan.Flag("collection", "要扫描的 Postman 集合。此标志可以重复。已弃用的标志。").Hidden().Strings()
+	postmanCollectionIDs = postmanScan.Flag("collection-id", "要扫描的 Postman 集合 ID。此标志可以重复。").Strings()
+	
+	postmanEnvironments = postmanScan.Flag("environment", "要扫描的 Postman 环境。此标志可以重复。").Strings()
+	
+	postmanIncludeCollections   = postmanScan.Flag("include-collections", "要包括在扫描中的集合。此标志可以重复。已弃用的标志。").Hidden().Strings()
+	postmanIncludeCollectionIDs = postmanScan.Flag("include-collection-id", "要包括在扫描中的集合 ID。此标志可以重复。").Strings()
+	
+	postmanIncludeEnvironments = postmanScan.Flag("include-environments", "要包括在扫描中的环境。此标志可以重复。").Strings()
+	
+	postmanExcludeCollections   = postmanScan.Flag("exclude-collections", "要从扫描中排除的集合。此标志可以重复。已弃用的标志。").Hidden().Strings()
+	postmanExcludeCollectionIDs = postmanScan.Flag("exclude-collection-id", "要从扫描中排除的集合 ID。此标志可以重复。").Strings()
+	
+	postmanExcludeEnvironments = postmanScan.Flag("exclude-environments", "要从扫描中排除的环境。此标志可以重复。").Strings()
+	postmanWorkspacePaths      = postmanScan.Flag("workspace-paths", "Postman 工作区的路径。").Strings()
+	postmanCollectionPaths     = postmanScan.Flag("collection-paths", "Postman 集合的路径。").Strings()
+	postmanEnvironmentPaths    = postmanScan.Flag("environment-paths", "Postman 环境的路径。").Strings()
+	
+	elasticsearchScan           = cli.Command("elasticsearch", "扫描 Elasticsearch")
+	elasticsearchNodes          = elasticsearchScan.Flag("nodes", "Elasticsearch 节点").Envar("ELASTICSEARCH_NODES").Strings()
+	elasticsearchUsername       = elasticsearchScan.Flag("username", "Elasticsearch 用户名").Envar("ELASTICSEARCH_USERNAME").String()
+	elasticsearchPassword       = elasticsearchScan.Flag("password", "Elasticsearch 密码").Envar("ELASTICSEARCH_PASSWORD").String()
+	elasticsearchServiceToken   = elasticsearchScan.Flag("service-token", "Elasticsearch 服务令牌").Envar("ELASTICSEARCH_SERVICE_TOKEN").String()
+	elasticsearchCloudId        = elasticsearchScan.Flag("cloud-id", "Elasticsearch 云 ID。也可以通过环境变量提供").Envar("ELASTICSEARCH_CLOUD_ID").String()
+	elasticsearchAPIKey         = elasticsearchScan.Flag("api-key", "Elasticsearch API 密钥。也可以通过环境变量提供").Envar("ELASTICSEARCH_API_KEY").String()
+	elasticsearchIndexPattern   = elasticsearchScan.Flag("index-pattern", "过滤要搜索的索引").Default("*").Envar("ELASTICSEARCH_INDEX_PATTERN").String()
+	elasticsearchQueryJSON      = elasticsearchScan.Flag("query-json", "过滤要搜索的文档").Envar("ELASTICSEARCH_QUERY_JSON").String()
+	elasticsearchSinceTimestamp = elasticsearchScan.Flag("since-timestamp", "过滤自此时间戳以来创建的文档；覆盖任何来自 --query-json 的时间戳").Envar("ELASTICSEARCH_SINCE_TIMESTAMP").String()
+	elasticsearchBestEffortScan = elasticsearchScan.Flag("best-effort-scan", "尝试持续扫描集群").Envar("ELASTICSEARCH_BEST_EFFORT_SCAN").Bool()
+	
+	jenkinsScan                  = cli.Command("jenkins", "扫描 Jenkins")
 	jenkinsURL                   = jenkinsScan.Flag("url", "Jenkins URL").Envar("JENKINS_URL").Required().String()
-	jenkinsUsername              = jenkinsScan.Flag("username", "Jenkins username").Envar("JENKINS_USERNAME").String()
-	jenkinsPassword              = jenkinsScan.Flag("password", "Jenkins password").Envar("JENKINS_PASSWORD").String()
-	jenkinsInsecureSkipVerifyTLS = jenkinsScan.Flag("insecure-skip-verify-tls", "Skip TLS verification").Envar("JENKINS_INSECURE_SKIP_VERIFY_TLS").Bool()
+	jenkinsUsername              = jenkinsScan.Flag("username", "Jenkins 用户名").Envar("JENKINS_USERNAME").String()
+	jenkinsPassword              = jenkinsScan.Flag("password", "Jenkins 密码").Envar("JENKINS_PASSWORD").String()
+	jenkinsInsecureSkipVerifyTLS = jenkinsScan.Flag("insecure-skip-verify-tls", "跳过 TLS 验证").Envar("JENKINS_INSECURE_SKIP_VERIFY_TLS").Bool()
+	
+	huggingfaceScan     = cli.Command("huggingface", "在 HuggingFace 数据集、模型和空间中查找凭证。")
+	huggingfaceEndpoint = huggingfaceScan.Flag("endpoint", "HuggingFace 端点。").Default("https://huggingface.co").String()
+	huggingfaceModels   = huggingfaceScan.Flag("model", "要扫描的 HuggingFace 模型。此标志可以重复。示例: 'username/model'").Strings()
+	huggingfaceSpaces   = huggingfaceScan.Flag("space", "要扫描的 HuggingFace 空间。此标志可以重复。示例: 'username/space'").Strings()
+	huggingfaceDatasets = huggingfaceScan.Flag("dataset", "要扫描的 HuggingFace 数据集。此标志可以重复。示例: 'username/dataset'").Strings()
+	huggingfaceOrgs     = huggingfaceScan.Flag("org", `要扫描的 HuggingFace 组织。此标志可以重复。示例: "trufflesecurity"`).Strings()
+	huggingfaceUsers    = huggingfaceScan.Flag("user", `要扫描的 HuggingFace 用户。此标志可以重复。示例: "trufflesecurity"`).Strings()
+	huggingfaceToken    = huggingfaceScan.Flag("token", "HuggingFace token。可以通过环境变量 HUGGINGFACE_TOKEN 提供。").Envar("HUGGINGFACE_TOKEN").String()
+		
 
-	huggingfaceScan     = cli.Command("huggingface", "Find credentials in HuggingFace datasets, models and spaces.")
-	huggingfaceEndpoint = huggingfaceScan.Flag("endpoint", "HuggingFace endpoint.").Default("https://huggingface.co").String()
-	huggingfaceModels   = huggingfaceScan.Flag("model", "HuggingFace model to scan. You can repeat this flag. Example: 'username/model'").Strings()
-	huggingfaceSpaces   = huggingfaceScan.Flag("space", "HuggingFace space to scan. You can repeat this flag. Example: 'username/space'").Strings()
-	huggingfaceDatasets = huggingfaceScan.Flag("dataset", "HuggingFace dataset to scan. You can repeat this flag. Example: 'username/dataset'").Strings()
-	huggingfaceOrgs     = huggingfaceScan.Flag("org", `HuggingFace organization to scan. You can repeat this flag. Example: "trufflesecurity"`).Strings()
-	huggingfaceUsers    = huggingfaceScan.Flag("user", `HuggingFace user to scan. You can repeat this flag. Example: "trufflesecurity"`).Strings()
-	huggingfaceToken    = huggingfaceScan.Flag("token", "HuggingFace token. Can be provided with environment variable HUGGINGFACE_TOKEN.").Envar("HUGGINGFACE_TOKEN").String()
 
-	huggingfaceIncludeModels      = huggingfaceScan.Flag("include-models", "Models to include in scan. You can repeat this flag. Must use HuggingFace model full name. Example: 'username/model' (Only used with --user or --org)").Strings()
-	huggingfaceIncludeSpaces      = huggingfaceScan.Flag("include-spaces", "Spaces to include in scan. You can repeat this flag. Must use HuggingFace space full name. Example: 'username/space' (Only used with --user or --org)").Strings()
-	huggingfaceIncludeDatasets    = huggingfaceScan.Flag("include-datasets", "Datasets to include in scan. You can repeat this flag. Must use HuggingFace dataset full name. Example: 'username/dataset' (Only used with --user or --org)").Strings()
-	huggingfaceIgnoreModels       = huggingfaceScan.Flag("ignore-models", "Models to ignore in scan. You can repeat this flag. Must use HuggingFace model full name. Example: 'username/model' (Only used with --user or --org)").Strings()
-	huggingfaceIgnoreSpaces       = huggingfaceScan.Flag("ignore-spaces", "Spaces to ignore in scan. You can repeat this flag. Must use HuggingFace space full name. Example: 'username/space' (Only used with --user or --org)").Strings()
-	huggingfaceIgnoreDatasets     = huggingfaceScan.Flag("ignore-datasets", "Datasets to ignore in scan. You can repeat this flag. Must use HuggingFace dataset full name. Example: 'username/dataset' (Only used with --user or --org)").Strings()
-	huggingfaceSkipAllModels      = huggingfaceScan.Flag("skip-all-models", "Skip all model scans. (Only used with --user or --org)").Bool()
-	huggingfaceSkipAllSpaces      = huggingfaceScan.Flag("skip-all-spaces", "Skip all space scans. (Only used with --user or --org)").Bool()
-	huggingfaceSkipAllDatasets    = huggingfaceScan.Flag("skip-all-datasets", "Skip all dataset scans. (Only used with --user or --org)").Bool()
-	huggingfaceIncludeDiscussions = huggingfaceScan.Flag("include-discussions", "Include discussions in scan.").Bool()
-	huggingfaceIncludePrs         = huggingfaceScan.Flag("include-prs", "Include pull requests in scan.").Bool()
-
+	huggingfaceIncludeModels      = huggingfaceScan.Flag("include-models", "在扫描中包含的模型。您可以重复此标志。必须使用 HuggingFace 模型的完整名称。例如：'username/model'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceIncludeSpaces      = huggingfaceScan.Flag("include-spaces", "在扫描中包含的空间。您可以重复此标志。必须使用 HuggingFace 空间的完整名称。例如：'username/space'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceIncludeDatasets    = huggingfaceScan.Flag("include-datasets", "在扫描中包含的数据集。您可以重复此标志。必须使用 HuggingFace 数据集的完整名称。例如：'username/dataset'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceIgnoreModels       = huggingfaceScan.Flag("ignore-models", "在扫描中忽略的模型。您可以重复此标志。必须使用 HuggingFace 模型的完整名称。例如：'username/model'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceIgnoreSpaces       = huggingfaceScan.Flag("ignore-spaces", "在扫描中忽略的空间。您可以重复此标志。必须使用 HuggingFace 空间的完整名称。例如：'username/space'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceIgnoreDatasets     = huggingfaceScan.Flag("ignore-datasets", "在扫描中忽略的数据集。您可以重复此标志。必须使用 HuggingFace 数据集的完整名称。例如：'username/dataset'（仅与 --user 或 --org 一起使用）").Strings()
+	huggingfaceSkipAllModels      = huggingfaceScan.Flag("skip-all-models", "跳过所有模型扫描。（仅与 --user 或 --org 一起使用）").Bool()
+	huggingfaceSkipAllSpaces      = huggingfaceScan.Flag("skip-all-spaces", "跳过所有空间扫描。（仅与 --user 或 --org 一起使用）").Bool()
+	huggingfaceSkipAllDatasets    = huggingfaceScan.Flag("skip-all-datasets", "跳过所有数据集扫描。（仅与 --user 或 --org 一起使用）").Bool()
+	huggingfaceIncludeDiscussions = huggingfaceScan.Flag("include-discussions", "在扫描中包含讨论。").Bool()
+	huggingfaceIncludePrs         = huggingfaceScan.Flag("include-prs", "在扫描中包含拉取请求（PR）。").Bool()
+	
 	analyzeCmd = analyzer.Command(cli)
-	usingTUI   = false
+	usingTUI   = false	
 )
 
 func init() {
@@ -292,7 +292,7 @@ func init() {
 	default:
 		l := int8(*logLevel)
 		if l < -1 || l > 5 {
-			fmt.Fprintf(os.Stderr, "invalid log level: %d\n", *logLevel)
+			fmt.Fprintf(os.Stderr, "无效的日志级别: %d\n", *logLevel)
 			os.Exit(1)
 		}
 
@@ -342,7 +342,7 @@ func main() {
 
 	err := overseer.RunErr(updateCfg)
 	if err != nil {
-		logFatal(err, "error occurred with trufflehog updater 🐷")
+		logFatal(err, "trufflehog 更新器发生错误 🐷")
 	}
 }
 
@@ -364,7 +364,7 @@ func run(state overseer.State) {
 
 	go func() {
 		if err := cleantemp.CleanTempArtifacts(ctx); err != nil {
-			ctx.Logger().Error(err, "error cleaning temporary artifacts")
+			ctx.Logger().Error(err, "错误清理临时工件")
 		}
 	}()
 
@@ -375,16 +375,18 @@ func run(state overseer.State) {
 	signal.Notify(killSignal, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		<-killSignal
-		logger.Info("Received signal, shutting down.")
-		cancel(fmt.Errorf("canceling context due to signal"))
-
+		logger.Info("收到信号，正在关闭。")
+		cancel(fmt.Errorf("由于信号取消上下文"))
+	
 		if err := cleantemp.CleanTempArtifacts(ctx); err != nil {
-			logger.Error(err, "error cleaning temporary artifacts")
+			logger.Error(err, "清理临时工件时出错")
 		} else {
-			logger.Info("cleaned temporary artifacts")
+			logger.Info("已清理临时工件")
 		}
 		os.Exit(0)
 	}()
+	
+
 
 	logger.V(2).Info(fmt.Sprintf("trufflehog %s", version.BuildVersion))
 
@@ -398,7 +400,7 @@ func run(state overseer.State) {
 	if *gitScanSinceCommit != "" {
 		*concurrency = 1
 		if !isValidCommit(*gitScanSinceCommit) {
-			logger.Info("Warning: The provided commit hash appears to be invalid.")
+			logger.Info("警告:提供的提交哈希似乎无效。")
 		}
 	}
 
@@ -409,9 +411,9 @@ func run(state overseer.State) {
 			router := http.NewServeMux()
 			router.Handle("/debug/pprof/", http.DefaultServeMux)
 			router.Handle("/debug/fgprof", fgprof.Handler())
-			logger.Info("starting pprof and fgprof server on :18066 /debug/pprof and /debug/fgprof")
+			logger.Info("正在启动 pprof和fgprof 服务器在 :18066 /debug/pprof and /debug/fgprof")
 			if err := http.ListenAndServe(":18066", router); err != nil {
-				logger.Error(err, "error serving pprof and fgprof")
+				logger.Error(err, "错误提供pprof 和 fgprof")
 			}
 		}()
 	}
@@ -441,12 +443,12 @@ func run(state overseer.State) {
 		var err error
 		conf, err = config.Read(*configFilename)
 		if err != nil {
-			logFatal(err, "error parsing the provided configuration file")
+			logFatal(err, "解析提供的配置文件时出错")
 		}
 	}
 
 	if *detectorTimeout != 0 {
-		logger.Info("Setting detector timeout", "timeout", detectorTimeout.String())
+		logger.Info("设置检测超时", "timeout", detectorTimeout.String())
 		engine.SetDetectorTimeout(*detectorTimeout)
 		detectors.OverrideDetectorTimeout(*detectorTimeout)
 	}
@@ -474,7 +476,7 @@ func run(state overseer.State) {
 	}
 
 	if !*jsonLegacy && !*jsonOut {
-		fmt.Fprintf(os.Stderr, "🐷🔑🐷  TruffleHog. Unearth your secrets. 🐷🔑🐷\n\n")
+		fmt.Fprintf(os.Stderr, "🐷🔑🐷 TruffleHog。挖掘你的秘密. 🐷🔑🐷\n\n")
 	}
 
 	// Parse --results flag.
@@ -484,7 +486,7 @@ func run(state overseer.State) {
 	}
 	parsedResults, err := parseResults(results)
 	if err != nil {
-		logFatal(err, "failed to configure results flag")
+		logFatal(err, "配置结果标志失败")
 	}
 
 	verificationCacheMetrics := verificationcache.InMemoryMetrics{}
@@ -517,14 +519,14 @@ func run(state overseer.State) {
 
 	if *compareDetectionStrategies {
 		if err := compareScans(ctx, cmd, engConf); err != nil {
-			logFatal(err, "error comparing detection strategies")
+			logFatal(err, "错误比较检测策略")
 		}
 		return
 	}
 
 	metrics, err := runSingleScan(ctx, cmd, engConf)
 	if err != nil {
-		logFatal(err, "error running scan")
+		logFatal(err, "运行扫描时出错")
 	}
 
 	verificationCacheMetricsSnapshot := struct {
@@ -553,7 +555,7 @@ func run(state overseer.State) {
 	)
 
 	if metrics.hasFoundResults && *fail {
-		logger.V(2).Info("exiting with code 183 because results were found")
+		logger.V(2).Info("退出代码 183 因为已经存在文件")
 		os.Exit(183)
 	}
 }
@@ -574,7 +576,7 @@ func compareScans(ctx context.Context, cmd string, cfg engine.Config) error {
 		cfg.ShouldScanEntireChunk = true
 		entireMetrics, err = runSingleScan(ctx, cmd, cfg)
 		if err != nil {
-			ctx.Logger().Error(err, "error running scan with entire chunk span calculator")
+			ctx.Logger().Error(err, "错误运行扫描，使用整个块跨度计算器")
 		}
 	}()
 
