@@ -13,10 +13,10 @@ type gitlabCmdModel struct {
 
 func GetFields() gitlabCmdModel {
 	token := textinputs.InputConfig{
-		Label:       "GitLab token",
+		Label:       "GitLab 令牌",
 		Key:         "token",
 		Required:    true,
-		Help:        "Personal access token with read access",
+		Help:        "具有读取权限的个人访问令牌",
 		Placeholder: "glpat-",
 	}
 

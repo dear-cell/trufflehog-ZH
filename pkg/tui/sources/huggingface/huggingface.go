@@ -12,39 +12,39 @@ type huggingFaceCmdModel struct {
 }
 
 func GetNote() string {
-	return "Please enter the organization, user, model, space, or dataset you would like to scan."
+	return "请输入你希望扫描的组织、用户、模型、空间或数据集。"
 }
 
 func GetFields() huggingFaceCmdModel {
 	org := textinputs.InputConfig{
-		Label:    "Organization",
+		Label:    "组织",
 		Key:      "org",
 		Required: false,
-		Help:     "Hugging Face organization name. This will scan all models, datasets, and spaces belonging to the organization.",
+		Help:     "Hugging Face 组织名称。将扫描属于该组织的所有模型、数据集和空间。",
 	}
 	user := textinputs.InputConfig{
-		Label:    "Username",
+		Label:    "用户名",
 		Key:      "user",
 		Required: false,
-		Help:     "Hugging Face user. This will scan all models, datasets, and spaces belonging to the user.",
+		Help:     "Hugging Face 用户名。将扫描属于该用户的所有模型、数据集和空间。",
 	}
 	model := textinputs.InputConfig{
-		Label:    "Model",
+		Label:    "模型",
 		Key:      "model",
 		Required: false,
-		Help:     "Hugging Face model. Example: org/model_name or user/model_name",
+		Help:     "Hugging Face 模型。例如：org/model_name 或 user/model_name",
 	}
 	space := textinputs.InputConfig{
-		Label:    "Space",
+		Label:    "空间",
 		Key:      "space",
 		Required: false,
-		Help:     "Hugging Face space. Example: org/space_name or user/space_name.",
+		Help:     "Hugging Face 空间。例如：org/space_name 或 user/space_name。",
 	}
 	dataset := textinputs.InputConfig{
-		Label:    "Dataset",
+		Label:    "数据集",
 		Key:      "dataset",
 		Required: false,
-		Help:     "Hugging Face dataset. Example: org/dataset_name or user/dataset_name.",
+		Help:     "Hugging Face 数据集。例如：org/dataset_name 或 user/dataset_name。",
 	}
 
 	return huggingFaceCmdModel{textinputs.New([]textinputs.InputConfig{org, user, model, space, dataset})}

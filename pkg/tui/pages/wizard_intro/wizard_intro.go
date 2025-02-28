@@ -24,19 +24,19 @@ const (
 func (w Item) String() string {
 	switch w {
 	case ScanSourceWithWizard:
-		return "Scan a source using wizard"
+		return "使用向导扫描源代码"
 	case AnalyzeSecret:
-		return "Analyze a secret's permissions"
+		return "分析密钥权限"
 	//case ScanSourceWithConfig:
-	//	return "Scan a source with a config file"
+	//	return "使用配置文件扫描源代码"
 	case ViewHelpDocs:
-		return "View help docs"
+		return "查看帮助文档"
 	case ViewOSSProject:
-		return "View open-source project"
+		return "查看开源项目"
 	case EnterpriseInquire:
-		return "Inquire about TruffleHog Enterprise"
+		return "了解 TruffleHog 企业版"
 	case Quit:
-		return "Quit"
+		return "退出"
 	}
 	panic("unreachable")
 }
@@ -81,7 +81,7 @@ func (m *WizardIntro) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *WizardIntro) View() string {
 	s := strings.Builder{}
-	s.WriteString("What do you want to do?\n\n")
+	s.WriteString("您想要做什么？\n\n")
 
 	for i, selectorItem := range m.selector.Items() {
 		// Cast the interface to the concrete Item struct.

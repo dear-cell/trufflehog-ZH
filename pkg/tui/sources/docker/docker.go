@@ -13,10 +13,10 @@ type dockerCmdModel struct {
 
 func GetFields() dockerCmdModel {
 	images := textinputs.InputConfig{
-		Label:       "Docker image(s)",
+		Label:       "Docker 镜像",
 		Key:         "images",
 		Required:    true,
-		Help:        "Separate by space if multiple.",
+		Help:        "如果有多个，用空格分隔。",
 		Placeholder: "trufflesecurity/secrets",
 	}
 

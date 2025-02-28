@@ -11,12 +11,13 @@ type fsModel struct {
 	textinputs.Model
 }
 
+
 func GetFields() fsModel {
 	path := textinputs.InputConfig{
-		Label:       "Path",
+		Label:       "路径",
 		Key:         "path",
 		Required:    true,
-		Help:        "Files and directories to scan. Separate by space if multiple.",
+		Help:        "要扫描的文件和目录。如果有多个，用空格分隔。",
 		Placeholder: "path/to/file.txt path/to/another/dir",
 	}
 

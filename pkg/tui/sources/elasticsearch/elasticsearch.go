@@ -12,48 +12,49 @@ type elasticSearchCmdModel struct {
 }
 
 func GetNote() string {
-	return "To connect to a local cluster, please provide the node IPs and either (username AND password) OR service token. ⭐\n⭐ To connect to a cloud cluster, please provide cloud ID AND API key."
+	return "要连接到本地集群，请提供节点 IP 和（用户名 和 密码）或服务令牌。⭐\n⭐ 要连接到云集群，请提供云 ID 和 API 密钥。"
 }
 
 func GetFields() elasticSearchCmdModel {
 	return elasticSearchCmdModel{textinputs.New([]textinputs.InputConfig{
 		{
-			Label:    "Elastic node(s)",
+			Label:    "Elastic 节点",
 			Key:      "nodes",
 			Required: false,
-			Help:     "Elastic node IPs - for scanning local clusters. Separate by space if multiple.",
+			Help:     "Elastic 节点 IP - 用于扫描本地集群。如果有多个节点，请用空格分隔。",
 		},
 		{
-			Label:    "Username",
+			Label:    "用户名",
 			Key:      "username",
 			Required: false,
-			Help:     "Elasticsearch username. Pairs with password. For scanning local clusters.",
+			Help:     "Elasticsearch 用户名。与密码配对，用于扫描本地集群。",
 		},
 		{
-			Label:    "Password",
+			Label:    "密码",
 			Key:      "password",
 			Required: false,
-			Help:     "Elasticsearch password. Pairs with username. For scanning local clusters.",
+			Help:     "Elasticsearch 密码。与用户名配对，用于扫描本地集群。",
 		},
 		{
-			Label:    "Service Token",
+			Label:    "服务令牌",
 			Key:      "serviceToken",
 			Required: false,
-			Help:     "Elastic service token. For scanning local clusters.",
+			Help:     "Elastic 服务令牌，用于扫描本地集群。",
 		},
 		{
-			Label:    "Cloud ID",
+			Label:    "云 ID",
 			Key:      "cloudId",
 			Required: false,
-			Help:     "Elastic cloud ID. Pairs with API key. For scanning cloud clusters.",
+			Help:     "Elastic 云 ID。与 API 密钥配对，用于扫描云集群。",
 		},
 		{
-			Label:    "API Key",
+			Label:    "API 密钥",
 			Key:      "apiKey",
 			Required: false,
-			Help:     "Elastic API key. Pairs with cloud ID. For scanning cloud clusters.",
+			Help:     "Elastic API 密钥。与云 ID 配对，用于扫描云集群。",
 		}})}
 }
+
 
 func findFirstNonEmptyKey(inputs map[string]textinputs.Input, keys []string) string {
 	for _, key := range keys {

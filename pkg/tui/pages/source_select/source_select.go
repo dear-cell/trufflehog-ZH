@@ -61,32 +61,32 @@ func New(c common.Common) *SourceSelect {
 
 	// Make list of SourceItems.
 	SourceItems := []list.Item{
-		// Open source sources.
-		OssItem("Git", "Scan git repositories."),
-		OssItem("GitHub", "Scan GitHub repositories and/or organizations."),
-		OssItem("Filesystem", "Scan your filesystem by selecting what directories to scan."),
-		OssItem("Hugging Face", "Scan Hugging Face, an AI/ML community."),
-		OssItem("Jenkins", "Scan Jenkins, a CI/CD platform. (Recently open-sourced from enterprise!)"),
-		OssItem("Elasticsearch", "Scan your Elasticsearch cluster or Elastic Cloud instance."),
-		OssItem("Postman", "Scan a collection, workspace, or environment from Postman, the API platform."),
-		OssItem("GitLab", "Scan GitLab repositories."),
-		OssItem("AWS S3", "Scan Amazon S3 buckets."),
-		OssItem("CircleCI", "Scan CircleCI, a CI/CD platform."),
-		OssItem("Syslog", "Scan syslog, event data logs."),
-		OssItem("Docker", "Scan a Docker instance, a containerized application."),
-		OssItem("GCS (Google Cloud Storage)", "Scan a Google Cloud Storage instance."),
-		// Enterprise sources.
-		EnterpriseItem("Artifactory", "Scan JFrog Artifactory packages."),
-		EnterpriseItem("Azure Repos", "Scan Microsoft Azure repositories."),
-		EnterpriseItem("BitBucket", "Scan Atlassian's Git-based source code repository hosting service."),
-		EnterpriseItem("Buildkite", "Scan Buildkite, a CI/CD platform."),
-		EnterpriseItem("Confluence", "Scan Atlassian's web-based wiki and knowledge base."),
-		EnterpriseItem("Gerrit", "Scan Gerrit, a code collaboration tool"),
-		EnterpriseItem("Jira", "Scan Atlassian's issue & project tracking software."),
-		EnterpriseItem("Slack", "Scan Slack, a messaging and communication platform."),
-		EnterpriseItem("Microsoft Teams", "Scan Microsoft Teams, a messaging and communication platform."),
-		EnterpriseItem("Microsoft Sharepoint", "Scan Microsoft Sharepoint, a collaboration and document management platform."),
-		EnterpriseItem("Google Drive", "Scan Google Drive, a cloud-based storage and file sync service."),
+		// 开源资源
+OssItem("Git", "扫描 Git 仓库。"),
+OssItem("GitHub", "扫描 GitHub 仓库和/或组织。"),
+OssItem("Filesystem", "通过选择要扫描的目录来扫描您的文件系统。"),
+OssItem("Hugging Face", "扫描 Hugging Face，一个 AI/ML 社区。"),
+OssItem("Jenkins", "扫描 Jenkins，一个 CI/CD 平台。（最近从企业版开源！）"),
+OssItem("Elasticsearch", "扫描您的 Elasticsearch 集群或 Elastic Cloud 实例。"),
+OssItem("Postman", "扫描 Postman 的集合、工作区或环境，Postman 是一个 API 平台。"),
+OssItem("GitLab", "扫描 GitLab 仓库。"),
+OssItem("AWS S3", "扫描 Amazon S3 存储桶。"),
+OssItem("CircleCI", "扫描 CircleCI，一个 CI/CD 平台。"),
+OssItem("Syslog", "扫描 syslog，事件数据日志。"),
+OssItem("Docker", "扫描 Docker 实例，一个容器化应用程序。"),
+OssItem("GCS (Google Cloud Storage)", "扫描 Google Cloud Storage 实例。"),
+// 企业资源
+EnterpriseItem("Artifactory", "扫描 JFrog Artifactory 包。"),
+EnterpriseItem("Azure Repos", "扫描 Microsoft Azure 仓库。"),
+EnterpriseItem("BitBucket", "扫描 Atlassian 的 Git 基于的源代码托管服务。"),
+EnterpriseItem("Buildkite", "扫描 Buildkite，一个 CI/CD 平台。"),
+EnterpriseItem("Confluence", "扫描 Atlassian 的基于 Web 的 wiki 和知识库。"),
+EnterpriseItem("Gerrit", "扫描 Gerrit，一个代码协作工具。"),
+EnterpriseItem("Jira", "扫描 Atlassian 的问题和项目跟踪软件。"),
+EnterpriseItem("Slack", "扫描 Slack，一个消息和通讯平台。"),
+EnterpriseItem("Microsoft Teams", "扫描 Microsoft Teams，一个消息和通讯平台。"),
+EnterpriseItem("Microsoft Sharepoint", "扫描 Microsoft Sharepoint，一个协作和文档管理平台。"),
+EnterpriseItem("Google Drive", "扫描 Google Drive，一个基于云的存储和文件同步服务。"),
 	}
 
 	// Setup list
@@ -182,7 +182,7 @@ func newSourceItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		if msg, ok := msg.(tea.KeyMsg); ok && key.Matches(msg, keys.choose) {
 			if selectedSourceItem.enterprise {
 				return m.NewStatusMessage(errorStatusMessageStyle(
-					"That's an enterprise only source. Learn more at trufflesecurity.com",
+					"这是一个仅限企业的来源。欲了解更多，请访问 trufflesecurity.com",
 				))
 			}
 

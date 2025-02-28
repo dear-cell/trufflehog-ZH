@@ -14,42 +14,42 @@ type truffleCmdModel struct {
 
 func GetTrufflehogConfiguration() truffleCmdModel {
 	verification := textinputs.InputConfig{
-		Label:       "Skip Verification",
+		Label:       "跳过验证",
 		Key:         "no-verification",
 		Required:    false,
-		Help:        "Check if a suspected secret is real or not",
+		Help:        "检查疑似密钥是否真实",
 		Placeholder: "false",
 	}
 
 	verifiedResults := textinputs.InputConfig{
-		Label:       "Verified results",
+		Label:       "仅验证结果",
 		Key:         "only-verified",
 		Required:    false,
-		Help:        "Return only verified results",
+		Help:        "仅返回验证过的结果",
 		Placeholder: "false",
 	}
 
 	jsonOutput := textinputs.InputConfig{
-		Label:       "JSON output",
+		Label:       "JSON 输出",
 		Key:         "json",
 		Required:    false,
-		Help:        "Output results to JSON",
+		Help:        "将结果输出为 JSON 格式",
 		Placeholder: "false",
 	}
 
 	excludeDetectors := textinputs.InputConfig{
-		Label:       "Exclude detectors",
+		Label:       "排除检测器",
 		Key:         "exclude_detectors",
 		Required:    false,
-		Help:        "Comma separated list of detector types to exclude. Protobuf name or IDs may be used, as well as ranges. IDs defined here take precedence over the include list.",
+		Help:        "以逗号分隔的检测器类型列表，排除这些检测器。可以使用 protobuf 名称或 ID，支持范围。这里定义的 ID 优先于包含列表。",
 		Placeholder: "",
 	}
 
 	concurrency := textinputs.InputConfig{
-		Label:       "Concurrency",
+		Label:       "并发数",
 		Key:         "concurrency",
 		Required:    false,
-		Help:        "Number of concurrent workers.",
+		Help:        "并发工作线程数。",
 		Placeholder: strconv.Itoa(runtime.NumCPU()),
 	}
 
@@ -97,7 +97,7 @@ func (m truffleCmdModel) Summary() string {
 	}
 
 	if summary.Len() == 0 {
-		summary.WriteString("\tRunning with defaults\n")
+		summary.WriteString("\t使用默认设置运行\n")
 
 	}
 

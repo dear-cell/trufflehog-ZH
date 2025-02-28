@@ -24,9 +24,9 @@ const (
 
 func (t tab) String() string {
 	return []string{
-		"1. Source Configuration",
-		"2. TruffleHog Configuration",
-		"3. Run",
+		"1. 源配置",
+		"2. TruffleHog 配置",
+		"3. 运行",
 	}[t]
 }
 

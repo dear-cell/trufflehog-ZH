@@ -12,31 +12,32 @@ type jenkinsCmdModel struct {
 }
 
 func GetNote() string {
-	return "If no username and password are provided, TruffleHog will attempt an unauthenticated Jenkins scan."
+	return "如果未提供用户名和密码，TruffleHog 将尝试进行未经认证的 Jenkins 扫描。"
 }
 
 func GetFields() jenkinsCmdModel {
 	return jenkinsCmdModel{textinputs.New([]textinputs.InputConfig{
 		{
-			Label:       "Endpoint URL",
+			Label:       "端点 URL",
 			Key:         "url",
 			Required:    true,
-			Help:        "URL of the Jenkins server.",
+			Help:        "Jenkins 服务器的 URL。",
 			Placeholder: "https://jenkins.example.com",
 		},
 		{
-			Label:    "Username",
+			Label:    "用户名",
 			Key:      "username",
 			Required: false,
-			Help:     "For authenticated scans - pairs with password.",
+			Help:     "用于认证扫描 - 与密码配对使用。",
 		},
 		{
-			Label:    "Password",
+			Label:    "密码",
 			Key:      "password",
 			Required: false,
-			Help:     "For authenticated scans - pairs with username.",
+			Help:     "用于认证扫描 - 与用户名配对使用。",
 		}})}
 }
+
 
 func checkIsAuthenticated(inputs map[string]textinputs.Input) bool {
 	username := inputs["username"].Value

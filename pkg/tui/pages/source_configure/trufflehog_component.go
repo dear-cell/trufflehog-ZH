@@ -44,8 +44,8 @@ func (m *TrufflehogComponent) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TrufflehogComponent) View() string {
 	var view strings.Builder
 
-	view.WriteString(styles.BoldTextStyle.Render("\nConfiguring "+styles.PrimaryTextStyle.Render("TruffleHog")) + "\n")
-	view.WriteString(styles.HintTextStyle.Render("You can skip this completely and run with defaults") + "\n\n")
+	view.WriteString(styles.BoldTextStyle.Render("\n配置ing "+styles.PrimaryTextStyle.Render("TruffleHog")) + "\n")
+	view.WriteString(styles.HintTextStyle.Render("你完全可以跳过此操作使用默认值运行") + "\n\n")
 
 	if m.form != nil {
 		view.WriteString(m.form.View())

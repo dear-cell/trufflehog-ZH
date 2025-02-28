@@ -23,9 +23,9 @@ type RunComponent struct {
 func NewRunComponent(common common.Common, parent *SourceConfigure) *RunComponent {
 	// Make list of SourceItems.
 	listItems := []list.Item{
-		Item{title: "🔎 Source configuration"},
-		Item{title: "🐽 TruffleHog configuration"},
-		Item{title: "💸 Sales pitch", description: "\tContinuous monitoring, state tracking, remediations, and more\n\t🔗 https://trufflesecurity.com/trufflehog"},
+		Item{title: "🔎 源配置"},
+		Item{title: "🐽 TruffleHog 配置"},
+		Item{title: "💸 销售推广", description: "\t持续监控、状态跟踪、修复措施等\n\t🔗 https://trufflesecurity.com/trufflehog"},
 	}
 
 	// Setup list
@@ -79,20 +79,20 @@ func (m *RunComponent) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *RunComponent) View() string {
 	var view strings.Builder
 
-	view.WriteString("\n🔎 Source configuration\n")
+	view.WriteString("\n🔎 源配置\n")
 	view.WriteString(m.parent.sourceFields.Summary())
 
-	view.WriteString("\n🐽 TruffleHog configuration\n")
+	view.WriteString("\n🐽 TruffleHog 配置\n")
 	view.WriteString(m.parent.truffleFields.Summary())
 
-	view.WriteString("\n💸 Sales pitch\n")
-	view.WriteString("\tContinuous monitoring, state tracking, remediations, and more\n")
+	view.WriteString("\n💸 销售推广\n")
+	view.WriteString("\t持续监控、状态跟踪、修复措施等\n")
 	view.WriteString("\t🔗 https://trufflesecurity.com/trufflehog\n\n")
 
-	view.WriteString(styles.BoldTextStyle.Render("\n\n🐷 Run TruffleHog for "+m.parent.configTabSource) + " 🐷\n\n")
+	view.WriteString(styles.BoldTextStyle.Render("\n\n🐷 运行 TruffleHog 为 "+m.parent.configTabSource) + " 🐷\n\n")
 
-	view.WriteString("Generated TruffleHog command\n")
-	view.WriteString(styles.HintTextStyle.Render("Save this if you want to run it again later!") + "\n")
+	view.WriteString("生成 TruffleHog 命令中\n")
+	view.WriteString(styles.HintTextStyle.Render("保存此命令可以在命令行运行!") + "\n")
 
 	command := m.parent.sourceFields.Cmd()
 	if m.parent.truffleFields.Cmd() != "" {
@@ -101,7 +101,7 @@ func (m *RunComponent) View() string {
 	view.WriteString(styles.CodeTextStyle.Render(command))
 
 	focusedStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-	view.WriteString("\n\n" + focusedStyle.Render("[ Run TruffleHog ]") + "\n\n")
+	view.WriteString("\n\n" + focusedStyle.Render("[ 运行 TruffleHog ]") + "\n\n")
 
 	// view.WriteString(m.reviewList.View())
 	return view.String()

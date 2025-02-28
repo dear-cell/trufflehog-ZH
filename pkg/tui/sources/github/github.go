@@ -12,23 +12,23 @@ type githubCmdModel struct {
 }
 
 func GetNote() string {
-	return "Please enter an organization OR repository."
+	return "请输入组织或仓库."
 }
 
 func GetFields() githubCmdModel {
 	org := textinputs.InputConfig{
-		Label:       "Organization",
+		Label:       "组织",
 		Key:         "org",
 		Required:    true,
-		Help:        "GitHub organization to scan.",
+		Help:        "要扫描的 GitHub 组织。",
 		Placeholder: "trufflesecurity",
 	}
 
 	repo := textinputs.InputConfig{
-		Label:       "Repository",
+		Label:       "仓库",
 		Key:         "repo",
 		Required:    true,
-		Help:        "GitHub repo to scan.",
+		Help:        "要扫描的 GitHub 仓库。",
 		Placeholder: "https://github.com/trufflesecurity/test_keys",
 	}
 

@@ -44,9 +44,9 @@ func (m *SourceComponent) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *SourceComponent) View() string {
 	var view strings.Builder
 
-	view.WriteString(styles.BoldTextStyle.Render("\nConfiguring "+styles.PrimaryTextStyle.Render(m.parent.configTabSource)) + "\n")
+	view.WriteString(styles.BoldTextStyle.Render("\n配置 "+styles.PrimaryTextStyle.Render(m.parent.configTabSource)) + "\n")
 
-	view.WriteString(styles.HintTextStyle.Render("* required field") + "\n\n")
+	view.WriteString(styles.HintTextStyle.Render("* 必填字段") + "\n\n")
 
 	sourceNote := sources.GetSourceNotes(m.parent.configTabSource)
 	if len(sourceNote) > 0 {

@@ -19,8 +19,8 @@ var (
 	// cursorStyle         = focusedStyle.Copy()
 	// cursorModeHelpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
 
-	focusedSkipButton = lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("[ Run with defaults ]")
-	blurredSkipButton = fmt.Sprintf("[ %s ]", lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Render("Run with defaults"))
+	focusedSkipButton = lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("[ 使用默认值运行 ]")
+	blurredSkipButton = fmt.Sprintf("[ %s ]", lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Render("使用默认值运行"))
 )
 
 // SelectNextMsg used for emitting events when the 'Next' button is selected.

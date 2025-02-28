@@ -10,14 +10,13 @@ import (
 type s3CmdModel struct {
 	textinputs.Model
 }
-
 func GetFields() s3CmdModel {
 	bucket := textinputs.InputConfig{
-		Label:       "S3 bucket name(s)",
+		Label:       "S3 桶名称",
 		Key:         "buckets",
 		Required:    true,
 		Placeholder: "truffletestbucket",
-		Help:        "Buckets to scan. Separate by space if multiple.",
+		Help:        "要扫描的桶。如果有多个，用空格分隔。",
 	}
 
 	return s3CmdModel{textinputs.New([]textinputs.InputConfig{bucket})}

@@ -12,34 +12,34 @@ type postmanCmdModel struct {
 }
 
 func GetNote() string {
-	return "Please enter an ID for a workspace, collection, or environment."
+	return "请输入工作区、集合或环境的 ID。"
 }
 
 func GetFields() postmanCmdModel {
 	token := textinputs.InputConfig{
-		Label:       "Postman token",
+		Label:       "Postman Token",
 		Key:         "token",
 		Required:    true,
-		Help:        "Postman API key",
+		Help:        "Postman API 密钥",
 		Placeholder: "PMAK-",
 	}
 	workspace := textinputs.InputConfig{
-		Label:    "Workspace ID",
+		Label:    "工作区 ID",
 		Key:      "workspace",
 		Required: false,
-		Help:     "ID for workspace",
+		Help:     "工作区的 ID",
 	}
 	collection := textinputs.InputConfig{
-		Label:    "Collection ID",
+		Label:    "集合 ID",
 		Key:      "collection",
 		Required: false,
-		Help:     "ID for an API collection",
+		Help:     "API 集合的 ID",
 	}
 	environment := textinputs.InputConfig{
-		Label:    "Environment ID",
+		Label:    "环境 ID",
 		Key:      "environment",
 		Required: false,
-		Help:     "ID for an environment",
+		Help:     "环境的 ID",
 	}
 
 	return postmanCmdModel{textinputs.New([]textinputs.InputConfig{token, workspace, collection, environment})}
